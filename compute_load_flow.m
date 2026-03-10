@@ -202,3 +202,44 @@ S_final = calc_S(V, Y_bus);
 P_slack = real(S_final(1)) * Sbase;
 Q_slack = imag(S_final(1)) * Sbase;
 fprintf('\nSlack bus power: P = %.2f W, Q = %.2f VAR\n', P_slack, Q_slack);
+
+%% =============================================
+%  Plot results
+%  =============================================
+figure('Name', 'Load Flow Results', 'Position', [100 100 1200 400]);
+
+% Subplot 1: Voltage Magnitude and Angle
+subplot(1,2,1);
+yyaxis left;
+bar(1:n_nodes, abs(V)*Vbase);
+ylabel('Magnitude [V]');
+ylim([min(abs(V))*0.995, max(abs(V))*1.005]*Vbase);
+
+yyaxis right;
+plot(1:n_nodes, rad2deg(angle(V)), '-o', 'LineWidth', 2, 'MarkerSize', 8, 'Color', [0.85 0.33 0.1]);
+ylabel('Angle [deg]');
+grid on;
+title('Voltage Profile');
+xlabel('Node');
+set(gca, 'XTickLabel', {'GCP','PM4','PM3','PM2','PM1'});
+legend({'Voltage Magnitude', 'Voltage Angle'}, 'Location', 'best');
+
+% Subplot 2: Power Injections
+subplot(1,2,2);
+% Reconstruct power injections from calculated values
+P_nodes = real(S_final) * Sbase;  % Convert to Watts
+Q_nodes = imag(S_final) * Sbase;  % Convert to VAR
+
+% Create grouped bar chart
+b = bar([P_nodes, Q_nodes]);
+b(1).FaceColor = [0.2 0.6 0.8];  % Active power - blue
+b(2).FaceColor = [0.8 0.4 0.2];  % Reactive power - orange
+
+xlabel('Node');
+ylabel('Power [W, VAR]');
+title('Power Injections');
+grid on;
+set(gca, 'XTick', 1:n_nodes);
+set(gca, 'XTickLabel', {'GCP','PM4','PM3','PM2','PM1'});
+legend({'Active Power (P)', 'Reactive Power (Q)'}, 'Location', 'best');
+ylim([min([0; P_nodes; Q_nodes]) * 1.05, max([0; P_nodes; Q_nodes]) * 1.05]);
