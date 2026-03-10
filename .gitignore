@@ -8,6 +8,9 @@
 # Derived content-obscured files
 *.p
 
+# Claude files
+.claude*
+
 # Compiled MEX files
 *.mex*
 
